@@ -2,10 +2,21 @@ import express from 'express';
 import dotenv from 'dotenv/config';
 import 'dotenv/config';
 import sql from './db.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 app.use(express.json({ limit: '10mb' })); // untuk base64 besar
 app.use(express.static('public'));
+
+// Setup __dirname agar bisa dipakai di ESM (karena pakai import)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 🧩 Route utama → arahkan ke public/index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Generate ID acak 4 digit
 function generateId() {
