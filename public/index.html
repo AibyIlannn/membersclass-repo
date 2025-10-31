@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CRUD Siswa - Modern</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1E1E1E;
+    color: #fff;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  /* Bubble Effects */
+  .bubble {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.4), rgba(37, 99, 235, 0.1));
+    animation: float 15s infinite ease-in-out;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .bubble:nth-child(1) {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    left: -100px;
+    animation-delay: 0s;
+  }
+  
+  .bubble:nth-child(2) {
+    width: 200px;
+    height: 200px;
+    top: 40%;
+    right: -50px;
+    animation-delay: 3s;
+  }
+  
+  .bubble:nth-child(3) {
+    width: 250px;
+    height: 250px;
+    bottom: -80px;
+    left: 30%;
+    animation-delay: 6s;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: slideDown 0.6s ease-out;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #3B82F6, #60A5FA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .subtitle {
+    color: #9CA3AF;
+    font-size: 1rem;
+  }
+  
+  .form-card {
+    background: rgba(38, 38, 38, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+  }
+  
+  form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+  
+  label {
+    color: #9CA3AF;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  input, textarea {
+    background: rgba(30, 30, 30, 0.6);
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+  
+  input:focus, textarea:focus {
+    border-color: #3B82F6;
+    background: rgba(30, 30, 30, 0.8);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+  }
+  
+  input[type="file"] {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  input[type="file"]::file-selector-button {
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  input[type="file"]::file-selector-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  }
+  
+  .btn-submit {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    border: none;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
+  }
+  
+  .btn-submit:active {
+    transform: translateY(0);
+  }
+  
+  .table-card {
+    background: rgba(38, 38, 38, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+    overflow-x: auto;
+  }
+  
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .table-header h2 {
+    font-size: 1.5rem;
+    color: #3B82F6;
+  }
+  
+  .data-count {
+    background: rgba(59, 130, 246, 0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #60A5FA;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  thead {
+    background: rgba(59, 130, 246, 0.1);
+  }
+  
+  th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #60A5FA;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+  }
+  
+  tbody tr {
+    background: rgba(30, 30, 30, 0.4);
+    transition: all 0.3s ease;
+  }
+  
+  tbody tr:hover {
+    background: rgba(59, 130, 246, 0.1);
+    transform: scale(1.01);
+  }
+  
+  td {
+    padding: 16px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  }
+  
+  .student-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .student-img:hover {
+    transform: scale(1.5);
+    border-color: #3B82F6;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.5);
+  }
+  
+  .btn-delete {
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6B7280;
+  }
+  
+  .empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2rem;
+    }
+    
+    form {
+      grid-template-columns: 1fr;
+    }
+    
+    .table-card {
+      padding: 15px;
+    }
+    
+    table {
+      font-size: 0.85rem;
+    }
+    
+    th, td {
+      padding: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  
+  <div class="container">
+    <header>
+      <h1>
+        <span>📘</span>
+        <span>Data Siswa</span>
+      </h1>
+      <p class="subtitle">Sistem Manajemen Data Siswa Modern</p>
+    </header>
+
+    <div class="form-card">
+      <form id="form">
+        <div class="form-group">
+          <label for="nama_lengkap">Nama Lengkap *</label>
+          <input type="text" id="nama_lengkap" name="nama_lengkap" placeholder="Masukkan nama lengkap" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="username">Username *</label>
+          <input type="text" id="username" name="username" placeholder="Masukkan username" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="kelas">Kelas</label>
+          <input type="text" id="kelas" name="kelas" placeholder="Contoh: XII RPL 1" />
+        </div>
+        
+        <div class="form-group">
+          <label for="role">Role</label>
+          <input type="text" id="role" name="role" placeholder="Contoh: Siswa" />
+        </div>
+        
+        <div class="form-group">
+          <label for="tanggal_lahir">Tanggal Lahir</label>
+          <input type="date" id="tanggal_lahir" name="tanggal_lahir" />
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="contoh@email.com" />
+        </div>
+        
+        <div class="form-group">
+          <label for="skill">Skill</label>
+          <input type="text" id="skill" name="skill" placeholder="Contoh: Web Development" />
+        </div>
+        
+        <div class="form-group">
+          <label for="gambar">Foto Profil</label>
+          <input type="file" id="gambar" accept="image/*" />
+        </div>
+        
+        <div class="form-group full-width">
+          <label for="deskripsi">Deskripsi</label>
+          <textarea id="deskripsi" name="deskripsi" placeholder="Tulis deskripsi tentang siswa..."></textarea>
+        </div>
+        
+        <button type="submit" class="btn-submit">✨ Tambah Siswa</button>
+      </form>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <h2>📊 Daftar Siswa</h2>
+        <span class="data-count" id="dataCount">0 Data</span>
+      </div>
+      
+      <table id="tabel">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Username</th>
+            <th>Kelas</th>
+            <th>Email</th>
+            <th>Skill</th>
+            <th>Foto</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+let gambarBase64 = null;
+
+document.getElementById('gambar').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    gambarBase64 = reader.result.split(',')[1];
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form).entries());
+  data.gambar = gambarBase64;
+  
+  try {
+    await fetch('/api/siswa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    form.reset();
+    gambarBase64 = null;
+    loadSiswa();
+  } catch (error) {
+    console.error('Error menambah siswa:', error);
+  }
+});
+
+async function loadSiswa() {
+  try {
+    const res = await fetch('/api/siswa');
+    const data = await res.json();
+    const tbody = document.querySelector('#tabel tbody');
+    
+    document.getElementById('dataCount').textContent = `${data.length} Data`;
+    
+    if (data.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8">
+            <div class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <p>Belum ada data siswa.</p>
+              <p>Tambahkan data siswa pertama Anda!</p>
+            </div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    tbody.innerHTML = data.map(s => `
+      <tr>
+        <td>${s.id}</td>
+        <td>${s.nama_lengkap}</td>
+        <td>${s.username}</td>
+        <td>${s.kelas || '-'}</td>
+        <td>${s.email || '-'}</td>
+        <td>${s.skill || '-'}</td>
+        <td><img src="/api/siswa/${s.id}/gambar" class="student-img" alt="${s.nama_lengkap}" /></td>
+        <td><button class="btn-delete" onclick="hapus('${s.id}')">🗑️</button></td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Error memuat data siswa:', error);
+  }
+}
+
+async function hapus(id) {
+  if (confirm('Yakin ingin menghapus data siswa ini?')) {
+    try {
+      await fetch('/api/siswa/' + id, { method: 'DELETE' });
+      loadSiswa();
+    } catch (error) {
+      console.error('Error menghapus siswa:', error);
+    }
+  }
+}
+
+loadSiswa();
+</script>
+</body>
+</html>
